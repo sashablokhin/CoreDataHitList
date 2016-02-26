@@ -59,7 +59,22 @@ class ViewController: UIViewController, UITableViewDataSource {
         title = "\"The List\""
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
     }
+    
+    
+    override func viewWillAppear(animated: Bool) { super.viewWillAppear(animated)
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext
+            
+        let fetchRequest = NSFetchRequest(entityName:"Person")
 
+        let fetchedResults = try! managedContext.executeFetchRequest(fetchRequest) as? [NSManagedObject]
+        
+        if let results = fetchedResults {
+            peoples = results
+        }
+    }
+    
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
