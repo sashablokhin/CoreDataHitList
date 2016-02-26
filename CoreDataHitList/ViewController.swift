@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import CoreData
 
 class ViewController: UIViewController, UITableViewDataSource {
 
-    var names = [String]()
+    //var names = [String]()
+    var peoples = [NSManagedObject]()
     
     @IBOutlet var tableView: UITableView!
     
@@ -19,7 +21,8 @@ class ViewController: UIViewController, UITableViewDataSource {
         
         let saveAction = UIAlertAction(title: "Save", style: .Default) { (action: UIAlertAction!) -> Void in
             let textField = alert.textFields![0] as UITextField
-            self.names.append(textField.text!)
+            //self.names.append(textField.text!)
+            self.saveName(textField.text!)
             self.tableView.reloadData()
         }
         let cancelAction = UIAlertAction(title: "Cancel",
@@ -37,9 +40,23 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     let reuseIdentifier = "cell"
     
+    func saveName(name: String) {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext
+            
+        let entity = NSEntityDescription.entityForName("Person", inManagedObjectContext: managedContext)
+        let person = NSManagedObject(entity: entity!, insertIntoManagedObjectContext: managedContext)
+
+        person.setValue(name, forKey: "name")
+            
+        try! managedContext.save()
+
+        peoples.append(person)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "The List"
+        title = "\"The List\""
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
     }
 
@@ -51,12 +68,14 @@ class ViewController: UIViewController, UITableViewDataSource {
     // MARK: - UITableViewDataSource
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return names.count
+        return peoples.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier)! as UITableViewCell
-        cell.textLabel!.text = names[indexPath.row]
+        
+        let person = peoples[indexPath.row]
+        cell.textLabel!.text = person.valueForKey("name") as? String
         
         return cell
     }
