@@ -11,8 +11,7 @@ import CoreData
 
 class ViewController: UIViewController, UITableViewDataSource {
 
-    //var names = [String]()
-    var peoples = [NSManagedObject]()
+    var peoples = [Person]()
     
     @IBOutlet var tableView: UITableView!
     
@@ -43,14 +42,18 @@ class ViewController: UIViewController, UITableViewDataSource {
     func saveName(name: String) {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext
+        
+        /*
+        let person = NSManagedObject(entity: entity!, insertIntoManagedObjectContext: managedContext)
+        person.setValue(name, forKey: "name")
+        */
             
         let entity = NSEntityDescription.entityForName("Person", inManagedObjectContext: managedContext)
-        let person = NSManagedObject(entity: entity!, insertIntoManagedObjectContext: managedContext)
+        let person = Person(entity: entity!, insertIntoManagedObjectContext: managedContext)
+        person.name = name
 
-        person.setValue(name, forKey: "name")
-            
         try! managedContext.save()
-
+            
         peoples.append(person)
     }
     
@@ -67,7 +70,8 @@ class ViewController: UIViewController, UITableViewDataSource {
             
         let fetchRequest = NSFetchRequest(entityName:"Person")
 
-        let fetchedResults = try! managedContext.executeFetchRequest(fetchRequest) as? [NSManagedObject]
+        //let fetchedResults = try! managedContext.executeFetchRequest(fetchRequest) as? [NSManagedObject]
+        let fetchedResults = try! managedContext.executeFetchRequest(fetchRequest) as? [Person]
         
         if let results = fetchedResults {
             peoples = results
@@ -90,7 +94,8 @@ class ViewController: UIViewController, UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier)! as UITableViewCell
         
         let person = peoples[indexPath.row]
-        cell.textLabel!.text = person.valueForKey("name") as? String
+        //cell.textLabel!.text = person.valueForKey("name") as? String
+        cell.textLabel!.text = person.name
         
         return cell
     }
